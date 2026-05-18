@@ -1,0 +1,75 @@
+<!DOCTYPE strict>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus | Terms of Service</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+
+    <script src="auth.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">NEXUS.</a>
+            <div class="nav-links">
+                <a href="index.html#home"><i data-lucide="home" style="width: 18px; height: 18px;"></i> Home</a>
+                <a href="index.html#products"><i data-lucide="package" style="width: 18px; height: 18px;"></i> Shop</a>
+                <a href="profile.html"><i data-lucide="user" style="width: 18px; height: 18px;"></i> Profile</a>
+            </div>
+            <div class="nav-actions">
+                <a href="auth.html#login" class="nav-btn auth-login-btn">Login</a>
+                <a href="auth.html#register" class="nav-btn primary auth-signup-btn">Register</a>
+                <button onclick="logout()" class="nav-btn auth-logout-btn" style="display:none; background:transparent; border:none; cursor:pointer; font-family: inherit;">Logout</button>
+                <button id="cartBtn" class="cart-btn" style="display:none;">
+                    <i data-lucide="shopping-bag"></i>
+                    <span id="cartCount" class="cart-count">0</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="profile-page" style="padding-top: 120px; padding-bottom: 4rem;">
+        <h1 style="margin-bottom: 2rem; color: var(--accent-color);">Terms of Service</h1>
+        <div style="background: var(--surface-color); padding: 3rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); color: var(--text-secondary); line-height: 1.8;">
+            <h2 style="color: var(--text-primary); margin-bottom: 1rem;">1. Agreement to Terms</h2>
+            <p style="margin-bottom: 2rem;">By accessing or using our website, you agree to be bound by these Terms of Service and all applicable laws and regulations.</p>
+            
+            <h2 style="color: var(--text-primary); margin-bottom: 1rem;">2. Use License</h2>
+            <p style="margin-bottom: 2rem;">Permission is granted to temporarily download one copy of the materials on Nexus's website for personal, non-commercial transitory viewing only.</p>
+            
+            <h2 style="color: var(--text-primary); margin-bottom: 1rem;">3. Disclaimer</h2>
+            <p style="margin-bottom: 2rem;">The materials on Nexus's website are provided on an 'as is' basis. Nexus makes no warranties, expressed or implied, and hereby disclaims all other warranties including, without limitation, implied warranties or conditions of merchantability.</p>
+            
+            <h2 style="color: var(--text-primary); margin-bottom: 1rem;">4. Limitations</h2>
+            <p style="margin-bottom: 0;">In no event shall Nexus or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on Nexus's website.</p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>NEXUS.</h3>
+                <p>Premium tech for premium living.</p>
+            </div>
+            <div class="footer-links">
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Service</a>
+                <a href="contact.html">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+</body>
+</html>

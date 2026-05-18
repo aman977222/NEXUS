@@ -1,0 +1,131 @@
+<!DOCTYPE strict>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus | Contact Us</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    
+    <!-- Crypto for Passwords -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+    <script src="auth.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">NEXUS.</a>
+            <div class="nav-links">
+                <a href="index.html#home"><i data-lucide="home" style="width: 18px; height: 18px;"></i> Home</a>
+                <a href="index.html#products"><i data-lucide="package" style="width: 18px; height: 18px;"></i> Shop</a>
+                <a href="profile.html"><i data-lucide="user" style="width: 18px; height: 18px;"></i> Profile</a>
+            </div>
+            <div class="nav-actions">
+                <a href="auth.html#login" class="nav-btn auth-login-btn">Login</a>
+                <a href="auth.html#register" class="nav-btn primary auth-signup-btn">Register</a>
+                <button onclick="logout()" class="nav-btn auth-logout-btn" style="display:none; background:transparent; border:none; cursor:pointer; font-family: inherit;">Logout</button>
+                <button id="cartBtn" class="cart-btn" style="display:none;">
+                    <i data-lucide="shopping-bag"></i>
+                    <span id="cartCount" class="cart-count">0</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="profile-page" style="padding-top: 120px; padding-bottom: 4rem;">
+        <h1 style="margin-bottom: 2rem; color: var(--accent-color);">Contact Us</h1>
+        <div style="background: var(--surface-color); padding: 3rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); display: flex; gap: 4rem; flex-wrap: wrap;">
+            
+            <div style="flex: 1; min-width: 300px;">
+                <h2 style="color: var(--text-primary); margin-bottom: 1.5rem;">Get in Touch</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.8;">Have questions about our premium tech products? Want to check on an order? We're here to help.</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="width: 40px; height: 40px; background: rgba(99, 102, 241, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-color);">
+                            <i data-lucide="map-pin" width="20"></i>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--text-primary);">Name</h4>
+                            <p style="color: var(--text-secondary);">Aman kumer jangid</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="width: 40px; height: 40px; background: rgba(99, 102, 241, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-color);">
+                            <i data-lucide="phone" width="20"></i>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--text-primary);">Phone</h4>
+                            <p style="color: var(--text-secondary);">+91 77######90</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="width: 40px; height: 40px; background: rgba(99, 102, 241, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-color);">
+                            <i data-lucide="mail" width="20"></i>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--text-primary);">Email</h4>
+                            <p style="color: var(--text-secondary);">aman.jangid1279@nexus.com</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="flex: 1; min-width: 300px;">
+                <form id="contactForm" class="edit-form" onsubmit="submitContactForm(event)">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="contactName" class="form-input" required placeholder="Your full name">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="contactEmail" class="form-input" required placeholder="your.email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="contactPhone" class="form-input" required placeholder="Your mobile number">
+                    </div>
+                    <div class="form-group">
+                        <label>Subject</label>
+                        <input type="text" id="contactSubject" class="form-input" required placeholder="How can we help?">
+                    </div>
+                    <div class="form-group">
+                        <label>Message</label>
+                        <textarea id="contactMessage" class="form-input" rows="5" required placeholder="Type your message here..."></textarea>
+                    </div>
+                    <button type="submit" class="cta-button" style="margin-top: 1rem; width: 100%;">Send Message</button>
+                </form>
+            </div>
+            
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>NEXUS.</h3>
+                <p>Premium tech for premium living.</p>
+            </div>
+            <div class="footer-links">
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Service</a>
+                <a href="contact.html">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+</body>
+</html>

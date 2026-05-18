@@ -1,0 +1,111 @@
+<!DOCTYPE strict>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus | Premium Electronics</title>
+    <meta name="description" content="Discover premium electronics and cutting-edge gadgets at Nexus.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    
+    <!-- Crypto for Passwords -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+    <script src="auth.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">NEXUS.</a>
+            <div class="nav-links">
+                <a href="index.html#home"><i data-lucide="home" style="width: 18px; height: 18px;"></i> Home</a>
+                <a href="index.html#products"><i data-lucide="package" style="width: 18px; height: 18px;"></i> Shop</a>
+                <a href="profile.html"><i data-lucide="user" style="width: 18px; height: 18px;"></i> Profile</a>
+            </div>
+            <div class="nav-actions">
+                <a href="auth.html#login" class="nav-btn auth-login-btn">Login</a>
+                <a href="auth.html#register" class="nav-btn primary auth-signup-btn">Register</a>
+                <button onclick="logout()" class="nav-btn auth-logout-btn" style="display:none; background:transparent; border:none; cursor:pointer; font-family: inherit;">Logout</button>
+                <button id="cartBtn" class="cart-btn">
+                    <i data-lucide="shopping-bag"></i>
+                    <span id="cartCount" class="cart-count">0</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h1>Elevate Your <span class="text-gradient">Tech Experience</span></h1>
+                <p>Discover our curated collection of premium electronics designed for the modern lifestyle.</p>
+                <a href="#products" class="cta-button">Shop Now</a>
+            </div>
+            <div class="hero-image">
+                <img src="assets/hero_headphones_1779082538361.png" alt="Premium Wireless Headphones" class="floating">
+            </div>
+        </section>
+
+        <section id="products" class="products-section">
+            <div class="section-header">
+                <h2>Featured Products</h2>
+                <div class="filter-btns">
+                    <button class="active">All</button>
+                    <button>Audio</button>
+                    <button>Wearables</button>
+                    <button>Cameras</button>
+                </div>
+            </div>
+            <div class="product-grid" id="productGrid">
+                <!-- Products dynamically inserted via JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Shopping Cart Modal -->
+    <div id="cartModal" class="cart-modal">
+        <div class="cart-overlay" id="cartOverlay"></div>
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>Your Cart</h2>
+                <button id="closeCart" class="close-btn"><i data-lucide="x"></i></button>
+            </div>
+            <div class="cart-items" id="cartItems">
+                <!-- Cart items dynamically inserted via JS -->
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span id="cartTotalValue">$0.00</span>
+                </div>
+                <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>NEXUS.</h3>
+                <p>Premium tech for premium living.</p>
+            </div>
+            <div class="footer-links">
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Service</a>
+                <a href="contact.html">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+</body>
+</html>
