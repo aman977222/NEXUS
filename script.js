@@ -176,7 +176,7 @@ function updateCartUI() {
             <img src="${item.image}" alt="${item.title}" class="cart-item-img">
             <div class="cart-item-details">
                 <div class="cart-item-title">${item.title}</div>
-                <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+                <div class="cart-item-price">₹${item.price.toFixed(2)}</div>
                 <div class="cart-item-actions">
                     <div class="quantity-controls">
                         <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)"><i data-lucide="minus" width="14" height="14"></i></button>
