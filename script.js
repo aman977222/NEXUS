@@ -88,7 +88,7 @@ function renderProducts() {
             <div class="product-category">${product.category}</div>
             <h3 class="product-title">${product.title}</h3>
             <div class="product-footer">
-                <div class="product-price">$${product.price.toFixed(2)}</div>
+                <div class="product-price">₹${product.price.toFixed(2)}</div>
                 <button class="add-to-cart" onclick="addToCart(${product.id})" aria-label="Add to cart">
                     <i data-lucide="plus"></i>
                 </button>
@@ -157,7 +157,7 @@ function updateCartUI() {
     
     // Update Total
     const totalValue = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    if (cartTotalValue) cartTotalValue.textContent = `$${totalValue.toFixed(2)}`;
+    if (cartTotalValue) cartTotalValue.textContent = `₹${totalValue.toFixed(2)}`;
     
     // Render Items
     if (!cartItemsContainer) return;
