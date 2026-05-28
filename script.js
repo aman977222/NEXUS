@@ -195,7 +195,8 @@ function updateCartUI() {
 
 // Checkout
 async function checkout() {
-    if (!__currentUserForCart) {
+     const isLoggedIn = localStorage.getItem('nexus_auth') === 'true';
+    if (!isLoggedIn || !__currentUserForCart) {
         alert('Please login to checkout!');
         window.location.href = 'auth.html';
         return;
