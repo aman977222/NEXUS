@@ -73,6 +73,7 @@ function updateNavForAuth() {
 
 function logout() {
     localStorage.setItem('nexus_auth', 'false');
+    localStorage.removeItem('nexus_profile');
     window.location.href = 'index.html';
 }
 
