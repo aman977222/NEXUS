@@ -929,3 +929,38 @@ footer {
         display: none;
     }
 }
+
+/* Password container for eye icon */
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-container .form-input {
+    width: 100%;
+    padding-right: 3rem;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 0.8rem;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    transition: var(--transition);
+}
+
+.password-toggle-btn:hover {
+    color: var(--text-primary);
+}
+
+.cta-button.secondary:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: var(--text-primary) !important;
+}

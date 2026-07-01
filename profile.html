@@ -11,6 +11,7 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="firebase-config.js"></script>
     
     <!-- Crypto for Passwords -->
@@ -83,6 +84,12 @@
 Silicon Valley, CA 94025
 United States</p>
                 </div>
+
+                <div class="profile-card">
+                    <h3>Security & Password</h3>
+                    <p class="text-secondary" style="margin-bottom: 1.5rem; font-size: 0.9rem;">Change your password or request a reset link.</p>
+                    <button class="cta-button" onclick="openResetPasswordModal()" style="width: 100%; border: none; font-family: inherit; cursor: pointer; padding: 0.75rem 1rem; font-size: 0.95rem;">Change Password</button>
+                </div>
             </div>
         </div>
     </main>
@@ -123,6 +130,64 @@ United States</textarea>
             </div>
             <div class="cart-footer">
                 <button class="checkout-btn" id="saveProfileBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div id="resetPasswordModal" class="cart-modal">
+        <div class="cart-overlay" id="resetPasswordOverlay" onclick="closeResetPasswordModal()"></div>
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>Change Password</h2>
+                <button onclick="closeResetPasswordModal()" class="close-btn"><i data-lucide="x"></i></button>
+            </div>
+            <div class="cart-items" style="padding-top: 1rem;">
+                <!-- Selection options -->
+                <div id="resetOptionsSection">
+                    <p class="text-secondary" style="margin-bottom: 1.5rem;">How would you like to change your password?</p>
+                    <button class="cta-button" onclick="sendResetEmailFromProfile()" style="width: 100%; margin-bottom: 1rem; border: none; font-family: inherit; cursor: pointer;">
+                        1. Send Password Reset Email
+                    </button>
+                    <button class="cta-button secondary" onclick="showOldPasswordForm()" style="width: 100%; border: 1px solid var(--border-color); background: transparent; color: white; font-family: inherit; cursor: pointer; padding: 0.8rem; border-radius: var(--radius-md);">
+                        2. Use Old & New Password
+                    </button>
+                </div>
+                
+                <!-- Old/New password form -->
+                <form id="oldPasswordForm" class="edit-form" style="display: none;" onsubmit="handlePasswordChangeSubmit(event)">
+                    <div class="form-group">
+                        <label>Old Password</label>
+                        <div class="password-container">
+                            <input type="password" id="oldPasswordInput" class="form-input" required>
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('oldPasswordInput', this)">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <div class="password-container">
+                            <input type="password" id="newPasswordInput" class="form-input" required>
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('newPasswordInput', this)">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm New Password</label>
+                        <div class="password-container">
+                            <input type="password" id="confirmNewPasswordInput" class="form-input" required>
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('confirmNewPasswordInput', this)">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button type="button" class="cta-button secondary" onclick="backToResetOptions()" style="flex: 1; border: 1px solid var(--border-color); background: transparent; color: white; font-family: inherit; cursor: pointer; padding: 0.8rem; border-radius: var(--radius-md);">Back</button>
+                        <button type="submit" class="checkout-btn" style="flex: 2; padding: 0.8rem;">Update Password</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

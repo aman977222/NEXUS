@@ -111,8 +111,29 @@ async function login(e) {
             }
 
             // Sign in with Firebase Auth to check email verification
-            const authResult = await firebase.auth().signInWithEmailAndPassword(email, password);
-            const fbUser = authResult.user;
+            let fbUser;
+            try {
+                const authResult = await firebase.auth().signInWithEmailAndPassword(email, password);
+                fbUser = authResult.user;
+            } catch (err) {
+                if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+                    // Check if Firestore password is correct
+                    const hashedPassword = typeof CryptoJS !== 'undefined' ? CryptoJS.SHA256(password).toString() : password;
+                    if (user.password === hashedPassword || user.password === password) {
+                        // Correct password, but Firebase Auth account doesn't exist or is out of sync. Let's create/sync it.
+                        try {
+                            const createResult = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                            fbUser = createResult.user;
+                        } catch (createErr) {
+                            throw new Error('User validation failed in Auth service: ' + createErr.message);
+                        }
+                    } else {
+                        throw new Error('User not found or wrong password');
+                    }
+                } else {
+                    throw err;
+                }
+            }
 
             if (!fbUser.emailVerified) {
                 // Send another verification email
@@ -164,7 +185,14 @@ async function register(e) {
     }
 
     try {
-        const userDoc = await db.collection('users').doc(email).get();
+        // Check if name already exists in Firestore database (to enforce uniqueness on Name)
+        const nameSnapshot = await db.collection('users').where('name', '==', name.trim()).get();
+        if (!nameSnapshot.empty) {
+            alert('Yeh name pehle se registered hai! Kripya koi dusra unique name enter karein.');
+            return;
+        }
+
+        const userDoc = await db.collection('users').doc(email.trim()).get();
         if (userDoc.exists) {
             alert('User with this email already exists!');
             return;
@@ -220,5 +248,171 @@ if (currentPath.endsWith('admin.html')) {
     const profile = JSON.parse(localStorage.getItem('nexus_profile'));
     if (!isLoggedIn || !profile || (profile.role !== 'admin' && profile.role !== 'superadmin')) {
         window.location.href = 'index.html';
+    }
+}
+
+// Toggle password visibility (show/hide)
+function togglePasswordVisibility(inputId, btnEl) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        btnEl.innerHTML = '<i data-lucide="eye-off"></i>';
+    } else {
+        input.type = 'password';
+        btnEl.innerHTML = '<i data-lucide="eye"></i>';
+    }
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+// Reset Password without login (Forgot Password link on login screen)
+async function forgotPassword(e) {
+    if (e) e.preventDefault();
+    const loginEmailInput = document.getElementById('loginEmail');
+    const defaultEmail = loginEmailInput ? loginEmailInput.value : '';
+    
+    const email = prompt("Enter your registered email address to receive a password reset link:", defaultEmail);
+    if (!email) return; // User cancelled or left empty
+    
+    try {
+        // Check if the email exists in our Firestore database first
+        const userDoc = await db.collection('users').doc(email.trim()).get();
+        if (!userDoc.exists) {
+            alert("Yeh email address registered nahi hai!");
+            return;
+        }
+
+        await firebase.auth().sendPasswordResetEmail(email.trim());
+        alert("Password reset link has been sent to your email! Please check your inbox/spam folder. 🎉");
+    } catch (err) {
+        console.error(err);
+        if (err.code === 'auth/user-not-found') {
+            try {
+                // User exists in Firestore but not in Firebase Auth (Legacy User)
+                const tempPassword = Math.random().toString(36).slice(-10) + "A1!";
+                await firebase.auth().createUserWithEmailAndPassword(email.trim(), tempPassword);
+                await firebase.auth().sendPasswordResetEmail(email.trim());
+                alert("Password reset link has been sent to your email! Please check your inbox/spam folder. 🎉");
+                return;
+            } catch (createErr) {
+                console.error(createErr);
+                alert(createErr.message || "Failed to send password reset email.");
+                return;
+            }
+        }
+        alert(err.message || "Failed to send password reset email.");
+    }
+}
+
+// Profile page password reset/change functions
+function openResetPasswordModal() {
+    const modal = document.getElementById('resetPasswordModal');
+    if (modal) modal.classList.add('active');
+}
+
+function closeResetPasswordModal() {
+    const modal = document.getElementById('resetPasswordModal');
+    if (modal) {
+        modal.classList.remove('active');
+        // Reset forms back to defaults
+        document.getElementById('resetOptionsSection').style.display = 'block';
+        document.getElementById('oldPasswordForm').style.display = 'none';
+        document.getElementById('oldPasswordInput').value = '';
+        document.getElementById('newPasswordInput').value = '';
+        document.getElementById('confirmNewPasswordInput').value = '';
+    }
+}
+
+function showOldPasswordForm() {
+    document.getElementById('resetOptionsSection').style.display = 'none';
+    document.getElementById('oldPasswordForm').style.display = 'block';
+}
+
+function backToResetOptions() {
+    document.getElementById('resetOptionsSection').style.display = 'block';
+    document.getElementById('oldPasswordForm').style.display = 'none';
+}
+
+async function sendResetEmailFromProfile() {
+    try {
+        const savedProfile = JSON.parse(localStorage.getItem('nexus_profile'));
+        if (!savedProfile || !savedProfile.email) {
+            throw new Error("User session not found.");
+        }
+
+        await firebase.auth().sendPasswordResetEmail(savedProfile.email);
+        alert("Password reset link has been sent to your email: " + savedProfile.email + " 🎉");
+        closeResetPasswordModal();
+    } catch (err) {
+        console.error(err);
+        const savedProfile = JSON.parse(localStorage.getItem('nexus_profile'));
+        if (err.code === 'auth/user-not-found' && savedProfile && savedProfile.email) {
+            try {
+                const tempPassword = Math.random().toString(36).slice(-10) + "A1!";
+                await firebase.auth().createUserWithEmailAndPassword(savedProfile.email, tempPassword);
+                await firebase.auth().sendPasswordResetEmail(savedProfile.email);
+                alert("Password reset link has been sent to your email: " + savedProfile.email + " 🎉");
+                closeResetPasswordModal();
+                return;
+            } catch (createErr) {
+                console.error(createErr);
+                alert(createErr.message || "Failed to send reset email.");
+                return;
+            }
+        }
+        alert(err.message || "Failed to send reset email.");
+    }
+}
+
+async function handlePasswordChangeSubmit(e) {
+    e.preventDefault();
+    const oldPassword = document.getElementById('oldPasswordInput').value;
+    const newPassword = document.getElementById('newPasswordInput').value;
+    const confirmNewPassword = document.getElementById('confirmNewPasswordInput').value;
+
+    if (newPassword !== confirmNewPassword) {
+        alert("New passwords do not match!");
+        return;
+    }
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerText;
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Updating...";
+
+    try {
+        const savedProfile = JSON.parse(localStorage.getItem('nexus_profile'));
+        if (!savedProfile || !savedProfile.email) {
+            throw new Error("User session not found.");
+        }
+
+        // 1. Sign in with old password to verify it and authenticate
+        const authResult = await firebase.auth().signInWithEmailAndPassword(savedProfile.email, oldPassword);
+        const fbUser = authResult.user;
+
+        // 2. Update password in Firebase Auth
+        await fbUser.updatePassword(newPassword);
+
+        // 3. Update password in Firestore database
+        const newHashedPassword = typeof CryptoJS !== 'undefined' ? CryptoJS.SHA256(newPassword).toString() : newPassword;
+        await db.collection('users').doc(savedProfile.email).update({
+            password: newHashedPassword
+        });
+
+        // 4. Update local storage profile cache
+        savedProfile.password = newHashedPassword;
+        localStorage.setItem('nexus_profile', JSON.stringify(savedProfile));
+
+        alert("Password updated successfully! 🎉");
+        closeResetPasswordModal();
+    } catch (err) {
+        console.error(err);
+        alert(err.message || "Failed to update password. Please check your old password.");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalBtnText;
     }
 }
