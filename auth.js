@@ -83,34 +83,68 @@ async function login(e) {
     const password = document.getElementById('loginPassword').value;
     const errorDiv = document.getElementById('loginError');
     
+    // Disable submit button / show status
+    const submitBtn = e ? e.target.querySelector('button[type="submit"]') : null;
+    const originalBtnText = submitBtn ? submitBtn.innerText : "";
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Logging in...";
+    }
+    if (errorDiv) errorDiv.style.display = 'none';
+
     try {
         const userDoc = await db.collection('users').doc(email).get();
         if (userDoc.exists) {
             const user = userDoc.data();
+            
+            // Bypass Firebase Auth for admins to prevent lockout
+            if (user.role === 'admin' || user.role === 'superadmin') {
+                const hashedPassword = typeof CryptoJS !== 'undefined' ? CryptoJS.SHA256(password).toString() : password;
+                if (user.password === hashedPassword || user.password === password) {
+                    localStorage.setItem('nexus_auth', 'true');
+                    localStorage.setItem('nexus_profile', JSON.stringify(user));
+                    window.location.href = 'admin.html';
+                    return;
+                } else {
+                    throw new Error('User not found or wrong password');
+                }
+            }
+
+            // Sign in with Firebase Auth to check email verification
+            const authResult = await firebase.auth().signInWithEmailAndPassword(email, password);
+            const fbUser = authResult.user;
+
+            if (!fbUser.emailVerified) {
+                // Send another verification email
+                await fbUser.sendEmailVerification();
+                throw new Error("Apka Email id verified nahi hai! Ek naya verification link aapke mail par send kiya gaya hai. Kripya use verify karein.");
+            }
+
             const hashedPassword = typeof CryptoJS !== 'undefined' ? CryptoJS.SHA256(password).toString() : password;
-            // Also allow plain text check for older users before we added hashing
             if (user.password === hashedPassword || user.password === password) {
                 localStorage.setItem('nexus_auth', 'true');
                 localStorage.setItem('nexus_profile', JSON.stringify(user));
-                
-                if (user.role === 'admin' || user.role === 'superadmin') {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'profile.html';
-                }
+                window.location.href = 'profile.html';
                 return;
+            } else {
+                throw new Error('User not found or wrong password');
             }
         }
         
-        if (errorDiv) {
-            errorDiv.style.display = 'block';
-            errorDiv.innerText = 'User not found or wrong password';
-        } else {
-            alert('User not found or wrong password');
-        }
+        throw new Error('User not found or wrong password');
     } catch (err) {
         console.error(err);
-        alert('Error logging in. Check connection.');
+        if (errorDiv) {
+            errorDiv.style.display = 'block';
+            errorDiv.innerText = err.message || 'Error logging in. Check connection.';
+        } else {
+            alert(err.message || 'Error logging in. Check connection.');
+        }
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalBtnText;
+        }
     }
 }
 
@@ -122,6 +156,13 @@ async function register(e) {
     const address = document.getElementById('regAddress').value;
     const password = document.getElementById('regPassword').value;
     
+    const submitBtn = e ? e.target.querySelector('button[type="submit"]') : null;
+    const originalBtnText = submitBtn ? submitBtn.innerText : "";
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Creating Account...";
+    }
+
     try {
         const userDoc = await db.collection('users').doc(email).get();
         if (userDoc.exists) {
@@ -129,6 +170,12 @@ async function register(e) {
             return;
         }
         
+        // 1. Create account in Firebase Auth
+        const authResult = await firebase.auth().createUserWithEmailAndPassword(email, password);
+        
+        // 2. Send Verification Email
+        await authResult.user.sendEmailVerification();
+
         const newUser = {
             name, email, phone, address, 
             password: typeof CryptoJS !== 'undefined' ? CryptoJS.SHA256(password).toString() : password,
@@ -136,9 +183,10 @@ async function register(e) {
             role: 'user'
         };
         
+        // 3. Save to Firestore
         await db.collection('users').doc(email).set(newUser);
         
-        alert('Registration successful! Please login.');
+        alert('Registration successful! 🎉 A verification email has been sent to your inbox. Please check your inbox (or spam folder) and verify your email before logging in.');
         if (typeof showLogin === 'function') {
             showLogin();
         } else {
@@ -146,7 +194,12 @@ async function register(e) {
         }
     } catch (err) {
         console.error(err);
-        alert('Error registering user.');
+        alert(err.message || 'Error registering user.');
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalBtnText;
+        }
     }
 }
 
